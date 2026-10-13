@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACEest Fitness and Gym</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        header {
+            background: #d4af37;
+            color: black;
+            text-align: center;
+            padding: 24px 12px;
+        }
+        main {
+            max-width: 1000px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+        .panel {
+            background: #252525;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #d4af37;
+        }
+        select, button {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+        button {
+            background: #d4af37;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        pre {
+            white-space: pre-wrap;
+            font: inherit;
+            line-height: 1.7;
+        }
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .metric {
+            background: #333;
+            padding: 15px;
+            border-radius: 5px;
+            flex: 1;
+            min-width: 150px;
+        }
+        @media (max-width: 600px) {
+            main { padding: 0 12px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ACEest FUNCTIONAL FITNESS</h1>
+        <p>ACEest Fitness and Gym</p>
+    </header>
+
+    <main>
+        <section class="panel">
+            <h2>Client Profile</h2>
+            <form method="get" action="/">
+                <label for="program">Select Program:</label>
+                <select id="program" name="program" required>
+                    <option value="">Choose a program</option>
+                    {% for name in programs %}
+                    <option value="{{ name }}"
+                        {% if selected == name %}selected{% endif %}>
+                        {{ name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit">View Plan</button>
+            </form>
+        </section>
+
+        {% if program_data %}
+        <section class="panel">
+            <h2 style="color: {{ program_data.color }}">Weekly Workout Chart</h2>
+            <pre>{{ program_data.workout }}</pre>
+        </section>
+
+        <section class="panel">
+            <h2>Daily Nutrition Plan (Tamil Nadu Context)</h2>
+            <pre>{{ program_data.diet }}</pre>
+        </section>
+        {% else %}
+        <section class="panel">
+            <p>Select a program to view its workout and nutrition plan.</p>
+        </section>
+        {% endif %}
+
+        <section class="panel">
+            <h2>Gym Metrics</h2>
+            <div class="metrics">
+                <div class="metric">
+                    <strong>Capacity</strong>
+                    <p>{{ gym_metrics.capacity }}</p>
+                </div>
+                <div class="metric">
+                    <strong>Area</strong>
+                    <p>{{ gym_metrics.area }}</p>
+                </div>
+                <div class="metric">
+                    <strong>Break-even</strong>
+                    <p>{{ gym_metrics.break_even }}</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
