@@ -74,21 +74,52 @@
 
     <main>
         <section class="panel">
-            <h2>Client Profile</h2>
-            <form method="get" action="/">
-                <label for="program">Select Program:</label>
-                <select id="program" name="program" required>
-                    <option value="">Choose a program</option>
-                    {% for name in programs %}
-                    <option value="{{ name }}"
-                        {% if selected == name %}selected{% endif %}>
-                        {{ name }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <button type="submit">View Plan</button>
-            </form>
-        </section>
+    <h2>Client Registration</h2>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p style="color: #d4af37; font-weight: bold;">
+                    {{ message }}
+                </p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="post" action="/clients/add">
+        <p>
+            <label for="name">Client Name:</label><br>
+            <input type="text" id="name" name="name" required>
+        </p>
+
+        <p>
+            <label for="age">Age:</label><br>
+            <input type="number" id="age" name="age" min="1" max="120" required>
+        </p>
+
+        <p>
+            <label for="height">Height (cm):</label><br>
+            <input type="number" id="height" name="height" step="0.1" min="1" required>
+        </p>
+
+        <p>
+            <label for="weight">Weight (kg):</label><br>
+            <input type="number" id="weight" name="weight" step="0.1" min="1" required>
+        </p>
+
+        <p>
+            <label for="program">Select Fitness Program:</label><br>
+            <select id="program" name="program" required>
+                <option value="">Choose a program</option>
+                {% for name in programs %}
+                <option value="{{ name }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <button type="submit">Register Client</button>
+    </form>
+</section>
 
         {% if program_data %}
         <section class="panel">
@@ -105,7 +136,46 @@
             <p>Select a program to view its workout and nutrition plan.</p>
         </section>
         {% endif %}
+               <section class="panel">
+            <h2>Registered Clients</h2>
 
+            {% if clients %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="color: #d4af37;">
+                            <th style="padding: 10px;">ID</th>
+                            <th style="padding: 10px;">Name</th>
+                            <th style="padding: 10px;">Age</th>
+                            <th style="padding: 10px;">Height (cm)</th>
+                            <th style="padding: 10px;">Weight (kg)</th>
+                            <th style="padding: 10px;">Fitness Program</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for client in clients %}
+                        <tr style="border-top: 1px solid #555;">
+                            <td style="padding: 10px;">{{ client.id }}</td>
+                            <td style="padding: 10px;">
+    <a href="{{ url_for('client_profile', client_id=client.id) }}"
+       style="color: #d4af37; text-decoration: none; font-weight: bold;">
+        {{ client.name }}
+    </a>
+</td>
+                            <td style="padding: 10px;">{{ client.age }}</td>
+                            <td style="padding: 10px;">{{ client.height }}</td>
+                            <td style="padding: 10px;">{{ client.weight }}</td>
+                            <td style="padding: 10px;">{{ client.program }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No clients registered yet.</p>
+            {% endif %}
+        </section>
         <section class="panel">
             <h2>Gym Metrics</h2>
             <div class="metrics">

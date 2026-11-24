@@ -18,3 +18,11 @@ htmlcov/
 .vscode/
 .idea/
 .DS_Store
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Application instance data
+instance/
