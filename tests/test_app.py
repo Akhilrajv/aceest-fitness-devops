@@ -1,5 +1,6 @@
 import pytest
 import sqlite3
+import re
 
 from app import app, PROGRAMS, GYM_METRICS
 
@@ -47,7 +48,14 @@ def client(tmp_path):
         app.config["DATABASE"] = original_database
         app.config["TESTING"] = original_testing
 
-
+def get_csrf_token(client):
+    response = client.get("/")
+    match = re.search(
+        rb'name="csrf_token" value="([^"]+)"',
+        response.data,
+    )
+    assert match is not None
+    return match.group(1).decode()
 def test_home_page_loads(client):
     response = client.get("/")
     assert response.status_code == 200
@@ -95,10 +103,29 @@ def test_invalid_program_does_not_crash(client):
     response = client.get("/?program=Unknown")
     assert response.status_code == 200
     assert b"Select a program to view its workout" in response.data
-def test_client_registration(client):
+
+
+def test_csrf_protection_rejects_missing_token(client):
     response = client.post(
         "/clients/add",
         data={
+            "name": "No Token Client",
+            "age": "25",
+            "height": "175",
+            "weight": "70",
+            "program": "Fat Loss (FL)",
+        },
+    )
+
+    assert response.status_code == 400
+
+def test_client_registration(client):
+    csrf_token = get_csrf_token(client)
+
+    response = client.post(
+        "/clients/add",
+        data={
+            "csrf_token": csrf_token,
             "name": "Pytest Registration Client",
             "age": "25",
             "height": "175",
@@ -137,9 +164,12 @@ def test_duplicate_client_registration(client):
     connection.commit()
     connection.close()
 
+    csrf_token = get_csrf_token(client)
+
     response = client.post(
         "/clients/add",
         data={
+            "csrf_token": csrf_token,
             "name": "Duplicate Test Client",
             "age": "31",
             "height": "171",
@@ -152,9 +182,12 @@ def test_duplicate_client_registration(client):
     assert response.status_code == 200
     assert b"A client with this name already exists." in response.data
 def test_client_profile_displays_client_details(client):
+    csrf_token = get_csrf_token(client)
+
     client.post(
         "/clients/add",
         data={
+            "csrf_token": csrf_token,
             "name": "Profile Test Client",
             "age": "28",
             "height": "172",

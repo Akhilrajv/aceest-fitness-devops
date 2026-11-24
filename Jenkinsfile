@@ -24,13 +24,18 @@ pipeline {
             }
         }
 
-        stage('Run Pytest') {
-            steps {
-                sh '''
-                    $PYTHON_ENV/bin/python -m pytest -v
-                '''
-            }
-        }
+stage('Run Pytest') {
+    steps {
+        sh '''
+            $PYTHON_ENV/bin/python -m pytest \
+                --cov=app \
+                --cov=database \
+                --cov-report=xml:coverage.xml \
+                --cov-report=term-missing \
+                -v
+        '''
+    }
+}
 
         stage('SonarQube Analysis') {
             steps {
@@ -42,10 +47,11 @@ pipeline {
                             ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=aceest-fitness \
                             -Dsonar.projectName='ACEest Fitness' \
-                            -Dsonar.sources=. \
+                            -Dsonar.sources=app.py,database.py,Dockerfile \
                             -Dsonar.tests=tests \
                             -Dsonar.test.inclusions=tests/**/*.py \
-                            -Dsonar.exclusions=tests/**,.venv/**,**/__pycache__/**,.pytest_cache/** \
+                            -Dsonar.exclusions=tests/**,.venv/**,**/__pycache__/**,.pytest_cache/**,original_versions/**,instance/**,coverage.xml \
+                            -Dsonar.python.coverage.reportPaths=coverage.xml \
                             -Dsonar.sourceEncoding=UTF-8
                         """
                     }

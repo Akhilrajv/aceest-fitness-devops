@@ -87,6 +87,9 @@
     {% endwith %}
 
     <form method="post" action="/clients/add">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+
         <p>
             <label for="name">Client Name:</label><br>
             <input type="text" id="name" name="name" required>

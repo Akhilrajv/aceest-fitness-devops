@@ -1,12 +1,18 @@
+import os
+import secrets
 import sqlite3
 
 from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_wtf.csrf import CSRFProtect
 from database import init_db, get_db
 
 app = Flask(__name__)
-app.secret_key = "aceest-fitness-devops-key"
+app.config["SECRET_KEY"] = (
+    os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
+)
 
 init_db(app)
+csrf = CSRFProtect(app)
 
 PROGRAMS = {
     "Fat Loss (FL)": {
@@ -150,4 +156,4 @@ def client_profile(client_id):
         program_data=program_data,
     )
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(port=5000, debug=False)
