@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -30,6 +29,27 @@ pipeline {
                 sh '''
                     $PYTHON_ENV/bin/python -m pytest -v
                 '''
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=aceest-fitness \
+                            -Dsonar.projectName='ACEest Fitness' \
+                            -Dsonar.sources=. \
+                            -Dsonar.tests=tests \
+                            -Dsonar.test.inclusions=tests/**/*.py \
+                            -Dsonar.exclusions=tests/**,.venv/**,**/__pycache__/**,.pytest_cache/** \
+                            -Dsonar.sourceEncoding=UTF-8
+                        """
+                    }
+                }
             }
         }
 
@@ -72,4 +92,3 @@ pipeline {
         }
     }
 }
-
